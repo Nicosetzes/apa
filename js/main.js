@@ -88,6 +88,96 @@ document.querySelector("#lotteryConfirmation").addEventListener("click", () => {
             document.getElementById("lotteryResults").appendChild(node);
         });
 
+        console.log(lotteryResults)
+
         document.getElementById("lotteryResults").classList.add("lotteryResults");
+
+        // FIXING LOTTERYRESULTS //
+
+        const definitiveLotteryResults = lotteryResults.map((result) => { return { player: result.player.player, team: result.team } })
+
+        fixture(definitiveLotteryResults, playerArray);
     }
 });
+
+// NÚMERO DE EQUIPOS PARES //
+
+const fixture = (lotteryArray, playerArray) => {
+    // console.log(lotteryArray);
+    const players = lotteryArray.map((result) => { return result.player })
+    const teams = lotteryArray.map((result) => { return result.team })
+    console.log(players)
+    console.log(teams)
+    // Calcular cantidad de equipos por jugador: //
+    const amountOfTeamsForEachPlayer = lotteryArray.length / playerArray.length;
+    console.log(amountOfTeamsForEachPlayer);
+    // Calcular cantidad de partidos totales por equipo: //
+    const amountOfGamesForEachTeam = lotteryArray.length - amountOfTeamsForEachPlayer;
+    console.log("partidos por equipo:" + amountOfGamesForEachTeam);
+    // Calcular cantidad de partidos en total (del torneo): //
+    const totalAmoutOfGames = (amountOfGamesForEachTeam * lotteryArray.length) / 2;  // Dividido 2, porque en cada partido se involucran 2 equipos;
+    console.log("cantidad de partidos total:" + totalAmoutOfGames);
+    // Calcular cantidad de partidos por fecha: //
+    const amountOfGamesByWeek = totalAmoutOfGames / (amountOfGamesForEachTeam / 2);
+    console.log("partidos por fecha:" + amountOfGamesByWeek);
+    // Calcular cantidad de fechas: //
+    const totalAmountOfWeeks = totalAmoutOfGames / amountOfGamesByWeek;
+    console.log("cantidad de fechas total:" + totalAmountOfWeeks)
+
+    // const week = [];
+    const games = [];
+    let limit = totalAmoutOfGames;
+
+    while (limit > 0) {
+        let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
+        let randomTeamOne = [lotteryArray[randomizedIndexForlotteryArray]];
+        randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
+        let randomTeamTwo = [lotteryArray[randomizedIndexForlotteryArray]];
+        if (randomTeamOne[0].player === randomTeamTwo[0].player) {
+            randomTeamOne = [];
+            randomTeamTwo = [];
+            console.log("Coincidieron los jugadores");
+            console.log(games);
+        }
+        else {
+            /// Quizás acá tengo que poner otro condicional para equilibrar las fechas ///
+            console.log("Partido arreglado");
+            let modifiedGame = randomTeamOne.concat(randomTeamTwo);
+            games.push(modifiedGame);
+            // modifiedGame = [];
+            console.log(games)
+            limit--
+        }
+    }
+
+    // games.forEach((element) => {
+    //     let node = document.createElement("DIV");
+    //     let textInsideNode = document.createTextNode(`${element[0].player} - ${element[0].team} vs ${element[1].player} - ${element[1].team}`);
+    //     node.appendChild(textInsideNode);
+    //     document.getElementById("matches").appendChild(node);
+    // });
+
+    // game.push([lotteryArray[randomizedIndexForlotteryArray]]);
+    // console.log(game);
+
+    // for (i = 0; i < totalAmountOfWeeks; i++) {
+
+    // }
+
+    // let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
+
+    // const weeks = lotteryArray.forEach()
+
+    // lotteryArray[randomizedIndexForlotteryArray];
+
+    // const teamSchedule = [];
+    // let i = amountOfGamesForEachTeam;
+
+    // while (i > 0) {
+    //     teams.forEach((team) => teamSchedule.push())
+
+    // }
+
+    // Calcular fechas (weeks): //
+    // const amountOfWeeks = 
+}
