@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APA</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/main.js" defer></script>
+</head>
+
+<body>
+    <div class="masterContainer">
+        <div class="playerContainer">
+            <span>¿Cuántos jugadores (humanos) participarán del sorteo?</span>
+            <select id="numberOfPlayers">
+                <option value="1">1 (un) jugador</option>
+                <option value="2">2 (dos) jugadores</option>
+                <option value="3">3 (tres) jugadores</option>
+                <option value="4">4 (cuatro) jugadores</option>
+                <option value="5">5 (cinco) jugadores</option>
+            </select>
+        </div>
+        <div class="teamContainer">
+            <span>¿Con cuántos equipos contará cada participante?</span>
+            <select id="numberOfTeams">
+                <option value="1">1 (un) equipo</option>
+                <option value="2">2 (dos) equipos</option>
+                <option value="3">3 (tres) equipos</option>
+                <option value="4">4 (cuatro) equipos</option>
+                <option value="5">5 (cinco) equipos</option>
+                <option value="6">6 (seis) equipo</option>
+                <option value="7">7 (siete) equipos</option>
+                <option value="8">8 (ocho) equipos</option>
+                <option value="9">9 (nueve) equipos</option>
+                <option value="10">10 (diez) equipos</option>
+            </select>
+            <button id="confirmationOfSettings">Confirmar</button>
+        </div>
+        <form id="playerNames"></form>
+        <form id="teamNames"></form>
+        <button id="lotteryConfirmation">Sortear equipos</button>
+    </div>
+    <div id="lotteryResults"></div>
+</body>
+
+</html>

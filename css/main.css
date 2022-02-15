@@ -1,0 +1,77 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: aliceblue;
+}
+
+button {
+    margin: 1rem;
+}
+
+form {
+    align-items: center;
+    background-color: beige;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 2rem;
+    width: 25%;
+}
+
+form div {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+form input {
+    margin: .5rem;
+}
+
+.formTitle {
+    font-weight: bold;
+}
+
+.masterContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.playerContainer, .teamContainer {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 1rem auto;
+    width: 50%;
+}
+
+span {
+    margin: 1rem;
+}
+
+.successful {
+    background-color: rgb(163, 240, 163);
+}
+
+.lotteryResults {
+    align-items: center;
+    background-color: aquamarine;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 2rem auto;
+    width: 50%;
+}
+
+.lotteryResults div {
+    font-weight: bold;
+    margin: 1rem 0;
+}
