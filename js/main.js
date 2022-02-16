@@ -88,8 +88,6 @@ document.querySelector("#lotteryConfirmation").addEventListener("click", () => {
             document.getElementById("lotteryResults").appendChild(node);
         });
 
-        console.log(lotteryResults)
-
         document.getElementById("lotteryResults").classList.add("lotteryResults");
 
         // FIXING LOTTERYRESULTS //
@@ -103,11 +101,12 @@ document.querySelector("#lotteryConfirmation").addEventListener("click", () => {
 // NÚMERO DE EQUIPOS PARES //
 
 const fixture = (lotteryArray, playerArray) => {
-    // console.log(lotteryArray);
-    const players = lotteryArray.map((result) => { return result.player })
-    const teams = lotteryArray.map((result) => { return result.team })
-    console.log(players)
-    console.log(teams)
+
+    // const players = lotteryArray.map((result) => { return result.player })
+    // const teams = lotteryArray.map((result) => { return result.team })
+    console.log(lotteryArray);
+    // console.log(players)
+    // console.log(teams)
     // Calcular cantidad de equipos por jugador: //
     const amountOfTeamsForEachPlayer = lotteryArray.length / playerArray.length;
     console.log(amountOfTeamsForEachPlayer);
@@ -124,9 +123,36 @@ const fixture = (lotteryArray, playerArray) => {
     const totalAmountOfWeeks = totalAmoutOfGames / amountOfGamesByWeek;
     console.log("cantidad de fechas total:" + totalAmountOfWeeks)
 
-    // const week = [];
-    const games = [];
+    // console.log(lotteryArray);
+    // let lotteryArray = [{ Boca }, { River }, { Lanús }, { Racing }]
+    // let rivals = [[rivalesDeBoca], [rivalesDeRiver], [], []]
+    // const indexes = [];
+    // for (i = 0; i < lotteryArray.length; i++) {
+    //     let index = lotteryArray.findIndex(lotteryArray[i]);
+    //     indexes.push(index);
+    // }
+
+    // const rivales = [[rivalesDeBoca], [rivalesDeRiver]];
+
+    // for (i = 0; i < lotteryArray.length; i++) {
+    //     let array = lotteryArray.filter((element) => element !== element.player);
+    //     rivales.push(array);
+    // }
+
+    const week = [];
+    const matches = [];
     let limit = totalAmoutOfGames;
+
+    const concertMatch = (randomTeamOne, randomTeamTwo) => {
+        let modifiedGame = randomTeamOne.concat(randomTeamTwo);
+        modifiedGame[0].playedAgainst ? modifiedGame[0].playedAgainst.push(modifiedGame[1].team) : modifiedGame[0].playedAgainst = [modifiedGame[1].team];
+        modifiedGame[1].playedAgainst ? modifiedGame[1].playedAgainst.push(modifiedGame[0].team) : modifiedGame[1].playedAgainst = [modifiedGame[0].team];
+        matches.push(modifiedGame);
+        console.log(randomTeamOne, randomTeamTwo)
+        console.log("Partido concertado");
+        // console.log(matches)
+        limit--;
+    }
 
     while (limit > 0) {
         let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
@@ -134,23 +160,106 @@ const fixture = (lotteryArray, playerArray) => {
         randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
         let randomTeamTwo = [lotteryArray[randomizedIndexForlotteryArray]];
         if (randomTeamOne[0].player === randomTeamTwo[0].player) {
+            console.log(randomTeamOne, randomTeamTwo)
+            console.log("Coincidieron los jugadores");
             randomTeamOne = [];
             randomTeamTwo = [];
-            console.log("Coincidieron los jugadores");
-            console.log(games);
         }
         else {
-            /// Quizás acá tengo que poner otro condicional para equilibrar las fechas ///
-            console.log("Partido arreglado");
-            let modifiedGame = randomTeamOne.concat(randomTeamTwo);
-            games.push(modifiedGame);
-            // modifiedGame = [];
-            console.log(games)
-            limit--
+            if (randomTeamOne[0].playedAgainst && randomTeamTwo[0].playedAgainst) {
+                console.log("Ambos equipos tienen partidos jugados contra otros");
+                if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team)) {
+                    console.log(randomTeamOne, randomTeamTwo)
+                    console.log("Ya jugaron entre si");
+                    randomTeamOne = [];
+                    randomTeamTwo = [];
+                }
+                else {
+                    concertMatch(randomTeamOne, randomTeamTwo)
+                }
+            }
+            else if (randomTeamOne[0].playedAgainst) {
+                console.log("El equipo 1 tiene partidos jugados contra otros")
+                console.log(randomTeamOne, randomTeamTwo);
+                if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team)) {
+                    console.log(randomTeamOne, randomTeamTwo)
+                    console.log("Ya jugaron entre si");
+                    randomTeamOne = [];
+                    randomTeamTwo = [];
+                }
+                else {
+                    concertMatch(randomTeamOne, randomTeamTwo)
+                }
+            }
+            else if (randomTeamTwo[0].playedAgainst) {
+                console.log("El equipo 2 tiene partidos jugados contra otros");
+                console.log(randomTeamOne, randomTeamTwo);
+                if (randomTeamTwo[0].playedAgainst.includes(randomTeamOne[0].team)) {
+                    console.log("Ya jugaron entre si");
+                    randomTeamOne = [];
+                    randomTeamTwo = [];
+                }
+                else {
+                    concertMatch(randomTeamOne, randomTeamTwo)
+                }
+            }
+            // Si llego a este punto del flujo, significa que ninguno jugó algún partido antes.
+            else {
+                console.log("Ninguno de los equipos había jugado antes");
+                concertMatch(randomTeamOne, randomTeamTwo)
+                // let modifiedGame = randomTeamOne.concat(randomTeamTwo);
+                // modifiedGame[0].playedAgainst ? modifiedGame[0].playedAgainst.push(modifiedGame[1].team) : modifiedGame[0].playedAgainst = [modifiedGame[1].team];
+                // modifiedGame[1].playedAgainst ? modifiedGame[1].playedAgainst.push(modifiedGame[0].team) : modifiedGame[1].playedAgainst = [modifiedGame[0].team];
+                // matches.push(modifiedGame);
+                // console.log(randomTeamOne, randomTeamTwo)
+                // console.log("Partido concertado");
+                // // console.log(matches)
+                // limit--
+            }
+            // if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team) {
+            //     console.log(randomTeamOne, randomTeamTwo)
+            //     console.log("Ya jugaron entre si");
+            //     randomTeamOne = [];
+            //     randomTeamTwo = [];
+            //     // console.log(matches);
+            // }
         }
     }
 
-    // games.forEach((element) => {
+    console.log(matches);
+
+    matches.forEach((element) => {
+        let node = document.createElement("DIV");
+        let textInsideNode = document.createTextNode(`${element[0].player} - ${element[0].team} vs ${element[1].player} - ${element[1].team}`);
+        node.appendChild(textInsideNode);
+        document.getElementById("matches").appendChild(node);
+    });
+
+
+    // // ESTABLECER RIVALES PARA CADA EQUIPO DE lotteryArray: //
+
+    // const allRivals = [];
+
+    // const establishRivalsForEachTeam = (lotteryArray) => {
+    //     for (i = 0; i < lotteryArray.length; i++) {
+    //         let rivals = lotteryArray.filter((element) => {
+    //             if (element.player !== lotteryArray[i].player) {
+    //                 return { element };
+    //             }
+    //         });
+    //         console.log(rivals);
+    //         rivals.forEach((element) => element.rivalOf = teamFromLotteryPick.team);
+    //         allRivals.push(rivals)
+    //     }
+    //     console.log(allRivals)
+    // }
+    // let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
+    // let randomTeamOne = lotteryArray[randomizedIndexForlotteryArray];
+    // establishRivalsForEachTeam(randomTeamOne);
+
+
+
+    // matches.forEach((element) => {
     //     let node = document.createElement("DIV");
     //     let textInsideNode = document.createTextNode(`${element[0].player} - ${element[0].team} vs ${element[1].player} - ${element[1].team}`);
     //     node.appendChild(textInsideNode);
@@ -181,3 +290,34 @@ const fixture = (lotteryArray, playerArray) => {
     // Calcular fechas (weeks): //
     // const amountOfWeeks = 
 }
+
+// while (limit > 0) {
+//     let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
+//     let randomTeamOne = [lotteryArray[randomizedIndexForlotteryArray]];
+//     randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
+//     let randomTeamTwo = [lotteryArray[randomizedIndexForlotteryArray]];
+//     if (randomTeamOne[0].player === randomTeamTwo[0].player) {
+//         console.log(randomTeamOne, randomTeamTwo)
+//         console.log("Coincidieron los jugadores");
+//         randomTeamOne = [];
+//         randomTeamTwo = [];
+//         // console.log(matches);
+//     }
+//     else if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team)) {
+//         console.log(randomTeamOne, randomTeamTwo)
+//         console.log("Ya jugaron entre si");
+//         randomTeamOne = [];
+//         randomTeamTwo = [];
+//         // console.log(matches);
+//     }
+//     else {
+//         let modifiedGame = randomTeamOne.concat(randomTeamTwo);
+//         modifiedGame[0].playedAgainst ? modifiedGame[0].playedAgainst.push(modifiedGame[1].team) : modifiedGame[0].playedAgainst = [modifiedGame[1].team];
+//         modifiedGame[1].playedAgainst ? modifiedGame[1].playedAgainst.push(modifiedGame[0].team) : modifiedGame[1].playedAgainst = [modifiedGame[0].team];
+//         matches.push(modifiedGame);
+//         console.log(randomTeamOne, randomTeamTwo)
+//         console.log("Partido concertado");
+//         // console.log(matches)
+//         limit--
+//     }
+// }
