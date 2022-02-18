@@ -34,7 +34,7 @@ const playerAndTeamSubmission = (NOfPlayers, NOfTeams) => {
         }
 
         document.getElementById("playerPickConfirmation").parentElement.classList.add("successful");
-        // console.log(playerArray)
+        console.log(playerArray)
     })
 
     document.querySelector("#teamPickConfirmation").addEventListener("click", (event) => {
@@ -44,13 +44,11 @@ const playerAndTeamSubmission = (NOfPlayers, NOfTeams) => {
             teamArray.push(teamInputAndValues[i].value);
         }
         document.getElementById("teamPickConfirmation").parentElement.classList.add("successful");
-        // console.log(teamArray)
+        console.log(teamArray)
     })
 }
 
 // FUNCIÓN PARA EMPAREJAR A CADA JUGADOR CON LOS EQUIPOS DISPONIBLES (AL AZAR) //
-
-const playerIndexes = []
 
 const teamIndexes = []
 
@@ -117,29 +115,12 @@ const fixture = (lotteryArray, playerArray) => {
     const totalAmoutOfGames = (amountOfGamesForEachTeam * lotteryArray.length) / 2;  // Dividido 2, porque en cada partido se involucran 2 equipos;
     console.log("cantidad de partidos total:" + totalAmoutOfGames);
     // Calcular cantidad de partidos por fecha: //
-    const amountOfGamesByWeek = totalAmoutOfGames / (amountOfGamesForEachTeam / 2);
+    const amountOfGamesByWeek = lotteryArray.length / 2;
     console.log("partidos por fecha:" + amountOfGamesByWeek);
-    // Calcular cantidad de fechas: //
+    // Calcular cantidad de fechas: // 
     const totalAmountOfWeeks = totalAmoutOfGames / amountOfGamesByWeek;
     console.log("cantidad de fechas total:" + totalAmountOfWeeks)
 
-    // console.log(lotteryArray);
-    // let lotteryArray = [{ Boca }, { River }, { Lanús }, { Racing }]
-    // let rivals = [[rivalesDeBoca], [rivalesDeRiver], [], []]
-    // const indexes = [];
-    // for (i = 0; i < lotteryArray.length; i++) {
-    //     let index = lotteryArray.findIndex(lotteryArray[i]);
-    //     indexes.push(index);
-    // }
-
-    // const rivales = [[rivalesDeBoca], [rivalesDeRiver]];
-
-    // for (i = 0; i < lotteryArray.length; i++) {
-    //     let array = lotteryArray.filter((element) => element !== element.player);
-    //     rivales.push(array);
-    // }
-
-    const week = [];
     const matches = [];
     let limit = totalAmoutOfGames;
 
@@ -207,117 +188,137 @@ const fixture = (lotteryArray, playerArray) => {
             else {
                 console.log("Ninguno de los equipos había jugado antes");
                 concertMatch(randomTeamOne, randomTeamTwo)
-                // let modifiedGame = randomTeamOne.concat(randomTeamTwo);
-                // modifiedGame[0].playedAgainst ? modifiedGame[0].playedAgainst.push(modifiedGame[1].team) : modifiedGame[0].playedAgainst = [modifiedGame[1].team];
-                // modifiedGame[1].playedAgainst ? modifiedGame[1].playedAgainst.push(modifiedGame[0].team) : modifiedGame[1].playedAgainst = [modifiedGame[0].team];
-                // matches.push(modifiedGame);
-                // console.log(randomTeamOne, randomTeamTwo)
-                // console.log("Partido concertado");
-                // // console.log(matches)
-                // limit--
             }
-            // if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team) {
-            //     console.log(randomTeamOne, randomTeamTwo)
-            //     console.log("Ya jugaron entre si");
-            //     randomTeamOne = [];
-            //     randomTeamTwo = [];
-            //     // console.log(matches);
-            // }
         }
     }
 
     console.log(matches);
 
-    matches.forEach((element) => {
-        let node = document.createElement("DIV");
-        let textInsideNode = document.createTextNode(`${element[0].player} - ${element[0].team} vs ${element[1].player} - ${element[1].team}`);
-        node.appendChild(textInsideNode);
-        document.getElementById("matches").appendChild(node);
+    // Función "containsArray" to check for arrays inside a bigger array //
+
+    Array.prototype.containsArray = function (val) {
+        var hash = {};
+        for (var i = 0; i < this.length; i++) {
+            hash[this[i]] = i;
+        }
+        return hash.hasOwnProperty(val);
+    }
+
+    // Termina la función "containsArray" //
+
+    // Función para combinar arrays dentro de un array //
+
+    // const oldArray = [[1], [2, 3], [4]];
+    // const newArray = Array.prototype.concat.apply([], oldArray);
+    // console.log(newArray); 
+
+    // Termina la función concat + apply
+
+    // const concatMatches = Array.prototype.concat.apply([], matches);
+
+    // console.log(concatMatches);
+
+    let weeks = [];
+
+    let matchesForFunction = [...matches]
+
+    let temporaryArray = [];
+
+    let gamesToBeAdded = totalAmoutOfGames;
+
+    let maxLoops = 10;
+
+    fixtureManagement(matches, matchesForFunction, weeks, temporaryArray, gamesToBeAdded, totalAmoutOfGames, amountOfGamesByWeek, maxLoops);
+
+    while (weeks.length < totalAmountOfWeeks) {
+        console.log("REPITO LA FUNCIÓN")
+        fixtureManagement(matches, matchesForFunction, weeks, temporaryArray, gamesToBeAdded, totalAmoutOfGames, amountOfGamesByWeek, maxLoops);
+    }
+
+    weeks.forEach((week, index) => {
+        let div = document.createElement("DIV");
+        let title = document.createElement("H3");
+        let weekTitle = document.createTextNode(`Fecha ${index + 1}`);
+        div.appendChild(title);
+        title.appendChild(weekTitle);
+        document.getElementById("matches").appendChild(div);
+        week.forEach((game) => {
+            let div = document.createElement("DIV");
+            let match = document.createTextNode(`${game[0].team} (${game[0].player}) vs ${game[1].team} (${game[1].player})`);
+            div.appendChild(match);
+            document.getElementById("matches").appendChild(div);
+        })
     });
+};
 
+const fixtureManagement = (matches, matchesForFunction, weeks, temporaryArray, gamesToBeAdded, totalAmoutOfGames, amountOfGamesByWeek, maxLoops) => {
+    while (gamesToBeAdded > 0) {
+        matchesForFunction.forEach((element, index) => {
+            console.log(weeks)
+            console.log(element[0], element[1]);
+            // console.log(temporaryArray.some(some => (some === element[0])));
+            // console.log(temporaryArray.some(some => (some === element[1])));
+            if ((temporaryArray.some(some => (some[0] === element[0]))) === true) {
+                console.log("Coincidió el equipo " + element[0].team);
+            }
+            else if ((temporaryArray.some(some => (some[1] === element[0]))) === true) {
+                console.log("Coincidió el equipo " + element[0].team);
+            }
+            else if ((temporaryArray.some(some => (some[0] === element[1]))) === true) {
+                console.log("Coincidió el equipo " + element[1].team);
+            }
+            else if ((temporaryArray.some(some => (some[1] === element[1]))) === true) {
+                console.log("Coincidió el equipo " + element[1].team);
+            }
+            else if (element === "Partido eliminado") {
+                console.log("Este partido ya fue agregado")
+            }
+            else {
+                console.log("No lo encontró, agrego");
+                temporaryArray.push([element[0], element[1]]);
+                matchesForFunction.splice(index, 1, "Partido eliminado");
+                console.log("Elimino en la posición " + index);
+                console.log(matchesForFunction);
+                gamesToBeAdded--;
+            }
+        });
 
-    // // ESTABLECER RIVALES PARA CADA EQUIPO DE lotteryArray: //
+        maxLoops--;
+        console.log("La cantidad de loops es: " + maxLoops)
 
-    // const allRivals = [];
-
-    // const establishRivalsForEachTeam = (lotteryArray) => {
-    //     for (i = 0; i < lotteryArray.length; i++) {
-    //         let rivals = lotteryArray.filter((element) => {
-    //             if (element.player !== lotteryArray[i].player) {
-    //                 return { element };
-    //             }
-    //         });
-    //         console.log(rivals);
-    //         rivals.forEach((element) => element.rivalOf = teamFromLotteryPick.team);
-    //         allRivals.push(rivals)
-    //     }
-    //     console.log(allRivals)
-    // }
-    // let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
-    // let randomTeamOne = lotteryArray[randomizedIndexForlotteryArray];
-    // establishRivalsForEachTeam(randomTeamOne);
-
-
-
-    // matches.forEach((element) => {
-    //     let node = document.createElement("DIV");
-    //     let textInsideNode = document.createTextNode(`${element[0].player} - ${element[0].team} vs ${element[1].player} - ${element[1].team}`);
-    //     node.appendChild(textInsideNode);
-    //     document.getElementById("matches").appendChild(node);
-    // });
-
-    // game.push([lotteryArray[randomizedIndexForlotteryArray]]);
-    // console.log(game);
-
-    // for (i = 0; i < totalAmountOfWeeks; i++) {
-
-    // }
-
-    // let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
-
-    // const weeks = lotteryArray.forEach()
-
-    // lotteryArray[randomizedIndexForlotteryArray];
-
-    // const teamSchedule = [];
-    // let i = amountOfGamesForEachTeam;
-
-    // while (i > 0) {
-    //     teams.forEach((team) => teamSchedule.push())
-
-    // }
-
-    // Calcular fechas (weeks): //
-    // const amountOfWeeks = 
+        if (temporaryArray.length === amountOfGamesByWeek) {
+            weeks.push(temporaryArray);
+            temporaryArray = [];
+        }
+        /// REVISAR ///
+        else if (maxLoops === 0) {
+            temporaryArray = [];
+            gamesToBeAdded = totalAmoutOfGames;
+            weeks = [];
+            matchesForFunction = [...matches]
+            break;
+        }
+        else {
+            continue;
+        }
+        console.log(weeks);
+    }
 }
 
-// while (limit > 0) {
-//     let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
-//     let randomTeamOne = [lotteryArray[randomizedIndexForlotteryArray]];
-//     randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
-//     let randomTeamTwo = [lotteryArray[randomizedIndexForlotteryArray]];
-//     if (randomTeamOne[0].player === randomTeamTwo[0].player) {
-//         console.log(randomTeamOne, randomTeamTwo)
-//         console.log("Coincidieron los jugadores");
-//         randomTeamOne = [];
-//         randomTeamTwo = [];
-//         // console.log(matches);
-//     }
-//     else if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team)) {
-//         console.log(randomTeamOne, randomTeamTwo)
-//         console.log("Ya jugaron entre si");
-//         randomTeamOne = [];
-//         randomTeamTwo = [];
-//         // console.log(matches);
-//     }
-//     else {
-//         let modifiedGame = randomTeamOne.concat(randomTeamTwo);
-//         modifiedGame[0].playedAgainst ? modifiedGame[0].playedAgainst.push(modifiedGame[1].team) : modifiedGame[0].playedAgainst = [modifiedGame[1].team];
-//         modifiedGame[1].playedAgainst ? modifiedGame[1].playedAgainst.push(modifiedGame[0].team) : modifiedGame[1].playedAgainst = [modifiedGame[0].team];
-//         matches.push(modifiedGame);
-//         console.log(randomTeamOne, randomTeamTwo)
-//         console.log("Partido concertado");
-//         // console.log(matches)
-//         limit--
-//     }
+// const lookingIntoTheArray = (fixedFixture) => {
+//     return fixedFixture.forEach((element) => element[0].team, element[1].team)
 // }
+
+
+// const createBalancedFixture = (arrayWithMathes) => {
+
+//     // Debería crear un bucle que recorra todo arrayWithMathes, que agregue una cantidad igual a amountOfGamesByWeek sobre temporaryArray.
+
+//     let temporaryArray = arrayWithMathes.filter((element, index) => {
+//         element[0].team && element[1].team !== lookingIntoTheArray(fixedFixture);
+//     })
+
+//     console.log(temporaryArray);
+// }
+
+// La idea sería vaciar el temporaryArray cuando complete 10 partidos con equipos que jueguen una vez por vez //

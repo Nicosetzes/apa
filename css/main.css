@@ -44,8 +44,24 @@ form input {
     justify-content: center;
 }
 
+.matches {
+    align-items: center;
+    background-color: bisque;
+    border-radius: 5%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 1rem auto;
+    width: 25%;
+}
+
+.matches div {
+    margin: 1rem auto;
+}
+
 .playerContainer, .teamContainer {
     align-items: center;
+    border-radius: 5%;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -63,6 +79,7 @@ span {
 
 .lotteryResults {
     align-items: center;
+    border-radius: 5%;
     background-color: aquamarine;
     display: flex;
     flex-direction: column;
