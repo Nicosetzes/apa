@@ -2,6 +2,9 @@
 
 const playerArray = [];
 const teamArray = [];
+let definitiveLotteryResults = [];
+
+// on-click event-listeners //
 
 document.getElementById("confirmationOfSettings").addEventListener("click", (event) => {
     event.preventDefault();
@@ -9,6 +12,16 @@ document.getElementById("confirmationOfSettings").addEventListener("click", (eve
     const numberOfTeams = Number(document.getElementById("numberOfTeams").value * numberOfPlayers);
     playerAndTeamSubmission(numberOfPlayers, numberOfTeams);
 });
+
+document.querySelector("#teamLottery").addEventListener("click", () => {
+    assignTeamsToPlayers()
+});
+
+document.querySelector("#fixtureGeneration").addEventListener("click", () => {
+    fixture(definitiveLotteryResults, playerArray)
+});
+
+// Genero la cantidad de inputs adecuada, declaro los on-click necesarios y capturo lo ingresado por el user //
 
 const playerAndTeamSubmission = (NOfPlayers, NOfTeams) => {
     const playerFormInputs = [];
@@ -46,13 +59,14 @@ const playerAndTeamSubmission = (NOfPlayers, NOfTeams) => {
         document.getElementById("teamPickConfirmation").parentElement.classList.add("successful");
         console.log(teamArray)
     })
+
 }
 
 // FUNCIÓN PARA EMPAREJAR A CADA JUGADOR CON LOS EQUIPOS DISPONIBLES (AL AZAR) //
 
-const teamIndexes = []
+const assignTeamsToPlayers = () => {
 
-document.querySelector("#lotteryConfirmation").addEventListener("click", () => {
+    const teamIndexes = [];
 
     if (playerArray.length !== 0 && teamArray.length !== 0) {
 
@@ -90,20 +104,46 @@ document.querySelector("#lotteryConfirmation").addEventListener("click", () => {
 
         // FIXING LOTTERYRESULTS //
 
-        const definitiveLotteryResults = lotteryResults.map((result) => { return { player: result.player.player, team: result.team } })
+        definitiveLotteryResults = lotteryResults.map((result) => { return { player: result.player.player, team: result.team } });
 
-        fixture(definitiveLotteryResults, playerArray);
+        console.log(definitiveLotteryResults);
+
+        // ARMANDO LA VISTA DEL TORNEO //
+        
+        const tableElements = [document.createTextNode(`Posición`), document.createTextNode(`Equipo`), document.createTextNode(`PJ`), document.createTextNode(`PG`), 
+        document.createTextNode(`PE`), document.createTextNode(`PP`), document.createTextNode(`GF`), document.createTextNode(`GC`), document.createTextNode(`+/-`), 
+        document.createTextNode(`Puntos`)];
+
+        for(i = 0; i < 10; i++) {
+            let div = document.createElement("DIV");
+            let span = document.createElement("SPAN");
+            span.appendChild(tableElements[i]);
+            div.appendChild(span);
+            document.getElementById("tournamentView").appendChild(div);
+        }
+
+        definitiveLotteryResults.forEach((element, index) => {  
+            
+            let headerArray = [element.position, element.team, element.player, element.totalGamesPlayed, element.win, element.draw, element.lose, element.scored, element.received,
+                element.difference, element.totalPoints];
+            
+            let tournamentViewChildren = document.getElementById("tournamentView").children;
+            let tournamentViewChildrenArray = Array.from(tournamentViewChildren);
+            
+            tournamentViewChildrenArray.forEach((child, childIndex) => {
+                let span = document.createElement("SPAN");
+                let textInsideSpan = document.createTextNode(`${headerArray[childIndex]}`);
+                span.appendChild(textInsideSpan);
+                child.appendChild(span); 
+            })
+        });
     }
-});
+}
 
-// NÚMERO DE EQUIPOS PARES //
+// FUNCIÓN PARA GENERAR EL FIXTURE //
 
 const fixture = (lotteryArray, playerArray) => {
 
-    // const players = lotteryArray.map((result) => { return result.player })
-    // const teams = lotteryArray.map((result) => { return result.team })
-    // console.log(players)
-    // console.log(teams)
     // Calcular cantidad de equipos por jugador: //
     const amountOfTeamsForEachPlayer = lotteryArray.length / playerArray.length;
     console.log(amountOfTeamsForEachPlayer);
@@ -120,36 +160,15 @@ const fixture = (lotteryArray, playerArray) => {
     const totalAmountOfWeeks = totalAmoutOfGames / amountOfGamesByWeek;
     console.log("cantidad de fechas total:" + totalAmountOfWeeks)
 
-    // const matches = [];
+    // Declaro las constantes necesarias //
+
     const weeks = [];
     const matchesAlreadyPlayedInTotal = [];
     const matchesAlreadyPlayedByTeam = [];
     let teamHasPlayedThisWeek = [];
     let temporaryWeek = [];
     let limit = totalAmoutOfGames;
-    // let maxLoops = 10000;
     let teamsThatHaveNotPlayedThisWeek = [...lotteryArray];
-
-    // PROBANDO FORMAS ALTERNATIVAS //
-
-    // const shuffledLotteryArray = lotteryArray
-    //     .map(value => ({ value, sort: Math.random() }))
-    //     .sort((a, b) => a.sort - b.sort)
-    //     .map(({ value }) => value);
-
-    // console.log(lotteryArray);
-    // console.log(shuffledLotteryArray); // Funciona perfecto //
-
-    // let match = [];
-    // const allMatches = [];
-
-    // shuffledLotteryArray.forEach((element) => {
-    //     match = 
-    // })
-
-    // const concertMatches = () => {
-    //     shuffledLotteryArray
-    // } 
 
     const concertMatch = (randomTeamOne, randomTeamTwo) => {
         if (!randomTeamOne && !randomTeamTwo) {
@@ -192,11 +211,8 @@ const fixture = (lotteryArray, playerArray) => {
                 teamHasPlayedThisWeek = [];
                 teamsThatHaveNotPlayedThisWeek = [...lotteryArray];
             }
-            // if (limit < 2 * amountOfGamesByWeek) {
-            //     console.log("PARTIDO CONCERTADO, AUN QUEDAN PARTIDOS EN LA FECHA");
-            // }
             // ÚLTIMO PARTIDO ARREGLADO (LIMIT = 0): //
-            if (limit === 0) {
+            if (limit === 0 && temporaryWeek.length != 0) {
                 weeks.push(temporaryWeek);
             }
             // Chequeo si uno de los equipos sorteados ya jugó su máximo de partidos: //
@@ -251,7 +267,7 @@ const fixture = (lotteryArray, playerArray) => {
         console.log("teamsThatHaveNotPlayedThisWeek: ");
         console.log(teamsThatHaveNotPlayedThisWeek);
         // Agrego la excepción de amountOfGamesByWeek > 4 así solo aplica para torneos grandes! //
-        limit < 2 * amountOfGamesByWeek && amountOfGamesByWeek > 4 ? teamsThatHaveNotPlayedThisWeek = [...lotteryArray] : console.log("AUN QUEDAN MUCHOS PARTIDOS")
+        limit < 2 * amountOfGamesByWeek && amountOfGamesByWeek >= 4 ? teamsThatHaveNotPlayedThisWeek = [...lotteryArray] : console.log("AUN QUEDAN MUCHOS PARTIDOS")
         firstRandomizedIndex = Math.floor(Math.random() * teamsThatHaveNotPlayedThisWeek.length);
         secondRandomizedIndex = Math.floor(Math.random() * teamsThatHaveNotPlayedThisWeek.length);
         // Randomizo los equipos //
@@ -259,7 +275,7 @@ const fixture = (lotteryArray, playerArray) => {
         randomTeamTwo = teamsThatHaveNotPlayedThisWeek[secondRandomizedIndex];
         console.log("EQUIPOS SORTEADOS: ")
         console.log(randomTeamOne, randomTeamTwo)
-        if (amountOfGamesByWeek > 4 && (matchesAlreadyPlayedInTotal.some((element) => element === randomTeamOne.team + "vs" + randomTeamTwo.team)) && (temporaryWeek.length === amountOfGamesByWeek - 1 || temporaryWeek.length === amountOfGamesByWeek - 2)) {
+        if (amountOfGamesByWeek >= 4 && (matchesAlreadyPlayedInTotal.some((element) => element === randomTeamOne.team + "vs" + randomTeamTwo.team)) && (temporaryWeek.length === amountOfGamesByWeek - 1 || temporaryWeek.length === amountOfGamesByWeek - 2)) {
             console.log("EL PARTIDO YA SE JUGÓ, PASO A LA SIGUIENTE FECHA");
             concertMatch(); // Los parámetros serán undefined //
         }
@@ -288,8 +304,10 @@ const fixture = (lotteryArray, playerArray) => {
     console.log(weeks);
     console.log("matchesAlreadyPlayedInTotal: ");
     console.log(matchesAlreadyPlayedInTotal);
-    console.log("teamsThatHaveNotPlayedThisWeek: ");
-    console.log(teamsThatHaveNotPlayedThisWeek);
+    // console.log("teamsThatHaveNotPlayedThisWeek: ");
+    // console.log(teamsThatHaveNotPlayedThisWeek);
+
+    // ANOTAR FIXTURE // 
 
     weeks.forEach((week, index) => {
         let div = document.createElement("DIV");
@@ -305,6 +323,27 @@ const fixture = (lotteryArray, playerArray) => {
             document.getElementById("matches").appendChild(div);
         })
     });
+
+};
+
+// const shuffledLotteryArray = lotteryArray
+    //     .map(value => ({ value, sort: Math.random() }))
+    //     .sort((a, b) => a.sort - b.sort)
+    //     .map(({ value }) => value);
+
+    // console.log(lotteryArray);
+    // console.log(shuffledLotteryArray); // Funciona perfecto //
+
+    // let match = [];
+    // const allMatches = [];
+
+    // shuffledLotteryArray.forEach((element) => {
+    //     match = 
+    // })
+
+    // const concertMatches = () => {
+    //     shuffledLotteryArray
+    // } 
 
     // Función "containsArray" to check for arrays inside a bigger array //
 
@@ -329,141 +368,3 @@ const fixture = (lotteryArray, playerArray) => {
     // const concatMatches = Array.prototype.concat.apply([], matches);
 
     // console.log(concatMatches);
-
-};
-
-
-// const createBalancedFixture = (arrayWithMathes) => {
-
-//     // Debería crear un bucle que recorra todo arrayWithMathes, que agregue una cantidad igual a amountOfGamesByWeek sobre temporaryArray.
-
-//     let temporaryArray = arrayWithMathes.filter((element, index) => {
-//         element[0].team && element[1].team !== lookingIntoTheArray(fixedFixture);
-//     })
-
-//     console.log(temporaryArray);
-// }
-
-// La idea sería vaciar el temporaryArray cuando complete 10 partidos con equipos que jueguen una vez por vez //
-
-// LO SIGUIENTE FUNCIONA CON BUGS //
-
-// let weeks = [];
-
-//     let temporaryArray = [];
-
-//     let gamesToBeAdded = totalAmoutOfGames;
-
-//     let maxLoops = 10;
-
-//     while (gamesToBeAdded > 0 && maxLoops != 0) {
-//         matches.forEach((element, index) => {
-//             console.log(weeks)
-//             console.log(element[0], element[1]);
-//             if ((temporaryArray.some(some => (some === element[0]))) === true) {
-//                 console.log("Coincidió el equipo " + element[0].team);
-//                 console.log("Me encuentro en la posición " + index + " del array")
-//             }
-//             else if ((temporaryArray.some(some => (some === element[1]))) === true) {
-//                 console.log("Coincidió el equipo " + element[1].team);
-//                 console.log("Me encuentro en la posición " + index + " del array")
-//             }
-//             else if (element === "Partido eliminado") {
-//                 console.log("Este partido ya fue agregado")
-//                 console.log("Me encuentro en la posición " + index + " del array")
-//             }
-//             else {
-//                 console.log("No lo encontró, agrego");
-//                 temporaryArray.push(element[0], element[1]);
-//                 matches.splice(index, 1, "Partido eliminado");
-//                 console.log("Elimino en la posición " + index);
-//                 console.log(matches)
-//                 gamesToBeAdded--;
-//             }
-//         });
-
-//         maxLoops--;
-//         console.log("Ahora maxLoops es igual a " + maxLoops);
-
-//         if (temporaryArray.length === amountOfGamesByWeek) {
-//             weeks.push(temporaryArray);
-//             temporaryArray = [];
-//             console.log("SE AGREGÓ UNA FECHA")
-//         }
-//         else {
-//             continue;
-//         }
-//     }
-
-// const matches = [];
-//     let limit = totalAmoutOfGames;
-
-//     const concertMatch = (randomTeamOne, randomTeamTwo) => {
-//         let modifiedGame = randomTeamOne.concat(randomTeamTwo);
-//         modifiedGame[0].playedAgainst ? modifiedGame[0].playedAgainst.push(modifiedGame[1].team) : modifiedGame[0].playedAgainst = [modifiedGame[1].team];
-//         modifiedGame[1].playedAgainst ? modifiedGame[1].playedAgainst.push(modifiedGame[0].team) : modifiedGame[1].playedAgainst = [modifiedGame[0].team];
-//         matches.push(modifiedGame);
-//         console.log(randomTeamOne, randomTeamTwo)
-//         console.log("Partido concertado");
-//         // console.log(matches)
-//         limit--;
-//     }
-
-//     while (limit > 0) {
-//         let randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
-//         let randomTeamOne = [lotteryArray[randomizedIndexForlotteryArray]];
-//         randomizedIndexForlotteryArray = Math.floor(Math.random() * lotteryArray.length);
-//         let randomTeamTwo = [lotteryArray[randomizedIndexForlotteryArray]];
-//         if (randomTeamOne[0].player === randomTeamTwo[0].player) {
-//             console.log(randomTeamOne, randomTeamTwo)
-//             console.log("Coincidieron los jugadores");
-//             randomTeamOne = [];
-//             randomTeamTwo = [];
-//         }
-//         else {
-//             if (randomTeamOne[0].playedAgainst && randomTeamTwo[0].playedAgainst) {
-//                 console.log("Ambos equipos tienen partidos jugados contra otros");
-//                 if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team)) {
-//                     console.log(randomTeamOne, randomTeamTwo)
-//                     console.log("Ya jugaron entre si");
-//                     randomTeamOne = [];
-//                     randomTeamTwo = [];
-//                 }
-//                 else {
-//                     concertMatch(randomTeamOne, randomTeamTwo)
-//                 }
-//             }
-//             else if (randomTeamOne[0].playedAgainst) {
-//                 console.log("El equipo 1 tiene partidos jugados contra otros")
-//                 console.log(randomTeamOne, randomTeamTwo);
-//                 if (randomTeamOne[0].playedAgainst.includes(randomTeamTwo[0].team)) {
-//                     console.log(randomTeamOne, randomTeamTwo)
-//                     console.log("Ya jugaron entre si");
-//                     randomTeamOne = [];
-//                     randomTeamTwo = [];
-//                 }
-//                 else {
-//                     concertMatch(randomTeamOne, randomTeamTwo)
-//                 }
-//             }
-//             else if (randomTeamTwo[0].playedAgainst) {
-//                 console.log("El equipo 2 tiene partidos jugados contra otros");
-//                 console.log(randomTeamOne, randomTeamTwo);
-//                 if (randomTeamTwo[0].playedAgainst.includes(randomTeamOne[0].team)) {
-//                     console.log("Ya jugaron entre si");
-//                     randomTeamOne = [];
-//                     randomTeamTwo = [];
-//                 }
-//                 else {
-//                     concertMatch(randomTeamOne, randomTeamTwo)
-//                 }
-//             }
-//             // Si llego a este punto del flujo, significa que ninguno jugó algún partido antes.
-//             else {
-//                 console.log("Ninguno de los equipos había jugado antes");
-//                 concertMatch(randomTeamOne, randomTeamTwo)
-//             }
-//         }
-//     }
-
-//     console.log(matches);

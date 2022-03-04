@@ -77,6 +77,41 @@ span {
     background-color: rgb(163, 240, 163);
 }
 
+#tournamentView {
+    align-items: center;
+    background-color: beige;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    margin: auto;
+    width: max-content;
+}
+
+#tournamentView div {
+    align-items: center;
+    border-bottom: black 1px solid;
+    border-right: black 1px solid;
+    border-top: black 1px solid;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#tournamentView div:first-child {
+    border-left: black 1px solid;
+}
+
+#tournamentView div span {
+    margin: 0;
+    padding: 1rem;
+    text-align: center;
+    width: 100%;
+}
+
+#tournamentView div span:first-child {
+    border-bottom: black 1px solid;
+}
+
 .lotteryResults {
     align-items: center;
     border-radius: 5%;
